@@ -3,6 +3,7 @@
 First, run the development server:
 
 ```bash
+bun install
 bun dev
 ```
 

@@ -35,7 +35,7 @@ export default function NewPostPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>New</BreadcrumbPage>
+            <BreadcrumbPage>Create a new patient</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

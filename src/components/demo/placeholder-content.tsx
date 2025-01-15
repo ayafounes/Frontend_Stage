@@ -9,7 +9,7 @@ export default function PlaceholderContent() {
       <CardContent className="p-6">
         <div className="flex justify-center items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
           <div className="flex flex-col relative">
-            <p>Import Export App content here</p>
+            <p>Formulaire here...</p>
           </div>
         </div>
       </CardContent>
