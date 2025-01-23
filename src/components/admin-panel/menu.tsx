@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // Import useRouter
 import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -22,7 +23,18 @@ interface MenuProps {
 
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
+  const router = useRouter(); // Initialize useRouter
   const menuList = getMenuList(pathname);
+
+  // Handle sign out
+  const handleSignOut = () => {
+    // Clear user-related data (e.g., tokens, roles) from localStorage or session storage
+    localStorage.removeItem("userRole"); // Example: Remove user role
+    localStorage.removeItem("authToken"); // Example: Remove authentication token
+
+    // Redirect to the login page
+    router.push("/login");
+  };
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -108,7 +120,7 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
+                    onClick={handleSignOut} // Call handleSignOut on click
                     variant="outline"
                     className="w-full justify-center h-10 mt-5"
                   >

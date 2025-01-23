@@ -13,7 +13,7 @@ import {
 
 export default function NewPostPage() {
   return (
-    <ContentLayout title="New Post">
+    <ContentLayout title="Add Patient">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -30,12 +30,12 @@ export default function NewPostPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/posts">Posts</Link>
+              <Link href="/posts">Content</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Create a new patient</BreadcrumbPage>
+            <BreadcrumbPage>Add Patient</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

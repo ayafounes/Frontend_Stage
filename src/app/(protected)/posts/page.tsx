@@ -1,19 +1,17 @@
-import Link from "next/link";
-
-import PlaceholderContent from "@/components/demo/placeholder-content";
-import { ContentLayout } from "@/components/admin-panel/content-layout";
+import Link from 'next/link';
+import AppointmentForm from '@/components/AppointmentForm';
+import { ContentLayout } from '@/components/admin-panel/content-layout';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default function PostsPage() {
   return (
-    <ContentLayout title="All Posts">
+    <ContentLayout title="Appointment Form">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -29,11 +27,13 @@ export default function PostsPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Posts</BreadcrumbPage>
+            <BreadcrumbLink asChild>
+              <Link href="/appointment">Appointment Form</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <PlaceholderContent />
+      <AppointmentForm />
     </ContentLayout>
   );
 }
