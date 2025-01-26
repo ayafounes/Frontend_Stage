@@ -1,40 +1,47 @@
 "use client";
 import { useState } from 'react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+// Define the Zod schema for form validation
+const schema = z.object({
+  dateConsultation: z.string().min(1, "Consultation date is required"),
+  diagnostic: z.string().min(1, "Diagnostic is required"),
+  treatment: z.string().min(1, "Treatment is required"),
+  symptoms: z.string().min(1, "Symptoms are required"),
+  cost: z.string().min(1, "Cost is required").regex(/^\d+(\.\d{1,2})?$/, "Cost must be a valid number"),
+  statusPaiement: z.string().min(1, "Payment status is required"),
+});
+
+// Infer the type from the schema
+type FormData = z.infer<typeof schema>;
+
 export default function ConsultationSheet() {
-  const [formData, setFormData] = useState({
-    dateConsultation: '',
-    diagnostic: '',
-    treatment: '',
-    symptoms: '',
-    cost: '',
-    statusPaiement: '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
     setMessage('');
 
     try {
-      const response = await axios.post('http://localhost:4000/api/consultation', formData, {
+      const response = await axios.post('http://localhost:4000/api/consultation', data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -64,7 +71,7 @@ export default function ConsultationSheet() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Consultation Details Section */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -72,12 +79,12 @@ export default function ConsultationSheet() {
                 <Input
                   type="date"
                   id="dateConsultation"
-                  name="dateConsultation"
-                  value={formData.dateConsultation}
-                  onChange={handleChange}
+                  {...register("dateConsultation")}
                   className="mt-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-gray-100"
-                  required
                 />
+                {errors.dateConsultation && (
+                  <p className="text-red-500 text-sm mt-1">{errors.dateConsultation.message}</p>
+                )}
               </div>
 
               <div>
@@ -85,12 +92,12 @@ export default function ConsultationSheet() {
                 <Input
                   type="number"
                   id="cost"
-                  name="cost"
-                  value={formData.cost}
-                  onChange={handleChange}
+                  {...register("cost")}
                   className="mt-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-gray-100"
-                  required
                 />
+                {errors.cost && (
+                  <p className="text-red-500 text-sm mt-1">{errors.cost.message}</p>
+                )}
               </div>
             </div>
 
@@ -98,55 +105,39 @@ export default function ConsultationSheet() {
               <label htmlFor="diagnostic" className="block text-sm font-medium text-muted-foreground dark:text-gray-300">Diagnostic</label>
               <Textarea
                 id="diagnostic"
-                name="diagnostic"
-                value={formData.diagnostic}
-                onChange={handleChange}
+                {...register("diagnostic")}
                 className="mt-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-gray-100"
-                required
               />
+              {errors.diagnostic && (
+                <p className="text-red-500 text-sm mt-1">{errors.diagnostic.message}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="treatment" className="block text-sm font-medium text-muted-foreground dark:text-gray-300">Treatment</label>
               <Textarea
                 id="treatment"
-                name="treatment"
-                value={formData.treatment}
-                onChange={handleChange}
+                {...register("treatment")}
                 className="mt-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-gray-100"
-                required
               />
+              {errors.treatment && (
+                <p className="text-red-500 text-sm mt-1">{errors.treatment.message}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="symptoms" className="block text-sm font-medium text-muted-foreground dark:text-gray-300">Symptoms</label>
               <Textarea
                 id="symptoms"
-                name="symptoms"
-                value={formData.symptoms}
-                onChange={handleChange}
+                {...register("symptoms")}
                 className="mt-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-gray-100"
-                required
               />
+              {errors.symptoms && (
+                <p className="text-red-500 text-sm mt-1">{errors.symptoms.message}</p>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="statusPaiement" className="block text-sm font-medium text-muted-foreground dark:text-gray-300">Payment Status</label>
-              <Select
-                value={formData.statusPaiement}
-                onValueChange={(value) => setFormData({ ...formData, statusPaiement: value })}
-                required
-              >
-                <SelectTrigger className="mt-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-gray-100">
-                  <SelectValue placeholder="Select Payment Status" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:text-gray-100">
-                  <SelectItem value="completed" className="dark:hover:bg-gray-700">Completed</SelectItem>
-                  <SelectItem value="pending" className="dark:hover:bg-gray-700">Pending</SelectItem>
-                  <SelectItem value="failed" className="dark:hover:bg-gray-700">Failed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            
 
             {/* Submit Button */}
             <div>

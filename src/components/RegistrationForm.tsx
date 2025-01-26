@@ -3,6 +3,7 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import ReactFlagsSelect from "react-flags-select"; // Import ReactFlagsSelect
 
 // Define the validation schema using Zod
 const schema = z.object({
@@ -14,7 +15,7 @@ const schema = z.object({
   phone: z.string().min(1, "Phone is required"),
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
-  country: z.string().min(1, "Country is required"),
+  country: z.string().min(1, "Country is required"), // Country is required
   postalCode: z.string().min(1, "Postal Code is required"),
   username: z.string().min(1, "Username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -31,10 +32,15 @@ export default function RegistrationForm() {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  const handleCountrySelect = (countryCode: string) => {
+    setValue("country", countryCode); // Update the form state with the selected country code
+  };
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     console.log("Form Data:", data);
@@ -193,11 +199,22 @@ export default function RegistrationForm() {
               {/* Country */}
               <div>
                 <label htmlFor="country" className="block text-gray-300 mb-2">Country</label>
-                <input
-                  {...register("country")}
-                  id="country"
-                  className="w-full bg-[#1E293B] text-white pl-4 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="Country"
+                <Controller
+                  name="country"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <ReactFlagsSelect
+                      selected={field.value}
+                      onSelect={(countryCode) => {
+                        field.onChange(countryCode); // Update the form state
+                        handleCountrySelect(countryCode); // Handle the country selection
+                      }}
+                      searchable
+                      placeholder="Select your country"
+                      className="w-full bg-[#1E293B] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  )}
                 />
                 {errors.country && (
                   <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>

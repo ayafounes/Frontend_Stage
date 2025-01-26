@@ -1,38 +1,44 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from '@/components/ui/button'; // Import Button component
+import { Button } from '@/components/ui/button';
+
+// Define the Zod schema for form validation
+const schema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
+  appointmentDate: z.string().min(1, "Appointment date is required"),
+  startTime: z.string().min(1, "Start time is required"),
+  endTime: z.string().min(1, "End time is required"),
+  appointmentType: z.string().min(1, "Appointment type is required"),
+  description: z.string().optional(),
+});
+
+// Infer the type from the schema
+type FormData = z.infer<typeof schema>;
 
 export default function AppointmentForm() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    appointmentDate: '',
-    startTime: '',
-    endTime: '',
-    appointmentType: '',
-    description: ''
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
     setMessage('');
 
     try {
-      const response = await axios.post('http://localhost:4000//api/appointement', formData, {
+      const response = await axios.post('http://localhost:4000/api/appointment', data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -55,7 +61,7 @@ export default function AppointmentForm() {
       <CardContent className="p-8">
         <div className="flex justify-center items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
           <div className="flex flex-col relative w-full max-w-4xl">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6 relative">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-red-600">
                   Appointment Form
@@ -71,13 +77,13 @@ export default function AppointmentForm() {
                     <input
                       type="text"
                       id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
+                      {...register("fullName")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your full name"
-                      required
                     />
+                    {errors.fullName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -88,12 +94,12 @@ export default function AppointmentForm() {
                     <input
                       type="date"
                       id="appointmentDate"
-                      name="appointmentDate"
-                      value={formData.appointmentDate}
-                      onChange={handleChange}
+                      {...register("appointmentDate")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     />
+                    {errors.appointmentDate && (
+                      <p className="text-red-500 text-sm mt-1">{errors.appointmentDate.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -104,12 +110,12 @@ export default function AppointmentForm() {
                     <input
                       type="time"
                       id="startTime"
-                      name="startTime"
-                      value={formData.startTime}
-                      onChange={handleChange}
+                      {...register("startTime")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     />
+                    {errors.startTime && (
+                      <p className="text-red-500 text-sm mt-1">{errors.startTime.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -120,12 +126,12 @@ export default function AppointmentForm() {
                     <input
                       type="time"
                       id="endTime"
-                      name="endTime"
-                      value={formData.endTime}
-                      onChange={handleChange}
+                      {...register("endTime")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     />
+                    {errors.endTime && (
+                      <p className="text-red-500 text-sm mt-1">{errors.endTime.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -135,11 +141,8 @@ export default function AppointmentForm() {
                   <div className="relative">
                     <select
                       id="appointmentType"
-                      name="appointmentType"
-                      value={formData.appointmentType}
-                      onChange={handleChange}
+                      {...register("appointmentType")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     >
                       <option value="" disabled>Select an option</option>
                       <option value="1st visit">1st Visit</option>
@@ -147,6 +150,9 @@ export default function AppointmentForm() {
                       <option value="urgence">Follow-up</option>
                       <option value="routine">Emergency</option>
                     </select>
+                    {errors.appointmentType && (
+                      <p className="text-red-500 text-sm mt-1">{errors.appointmentType.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -156,9 +162,7 @@ export default function AppointmentForm() {
                   <div className="relative">
                     <textarea
                       id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
+                      {...register("description")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter additional details"
                       rows={4}

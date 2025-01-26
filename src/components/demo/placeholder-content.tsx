@@ -1,57 +1,67 @@
 "use client";
-import { useState } from 'react';
-import axios from 'axios'; // Import axios
+import { useState } from "react";
+import axios from "axios";
+import ReactFlagsSelect from "react-flags-select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from '@/components/ui/button'; // Import Button component
+import { Button } from "@/components/ui/button";
 
 export default function PlaceholderContent() {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    birthDate: '',
-    gender: '',
-    maritalStatus: '',
-    occupation: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: '',
-    postalCode: '',
-    allergy: '',
-    bloodType: '',
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    gender: "",
+    maritalStatus: "",
+    occupation: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    country: "",
+    postalCode: "",
+    allergy: "",
+    bloodType: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
+    }));
+  };
+
+  const handleCountrySelect = (countryCode: string) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      country: countryCode,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const response = await axios.post('http://localhost:4000/api/patient', formData, {
+      const response = await axios.post("http://localhost:4000/api/patient", formData, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (response.status === 200) {
-        setMessage('Form submitted successfully!');
+        setMessage("Form submitted successfully!");
       } else {
-        setMessage(`Error: ${response.data.message || 'Something went wrong'}`);
+        setMessage(`Error: ${response.data.message || "Something went wrong"}`);
       }
     } catch (error: any) {
-      setMessage(`Error: ${error.message || 'An unexpected error occurred'}`);
+      setMessage(`Error: ${error.message || "An unexpected error occurred"}`);
     } finally {
       setLoading(false);
     }
@@ -73,7 +83,9 @@ export default function PlaceholderContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div className="space-y-2">
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    First Name
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -90,7 +102,9 @@ export default function PlaceholderContent() {
 
                 {/* Last Name */}
                 <div className="space-y-2">
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Last Name
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -107,7 +121,9 @@ export default function PlaceholderContent() {
 
                 {/* Birth Date */}
                 <div className="space-y-2">
-                  <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Birth Date</label>
+                  <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Birth Date
+                  </label>
                   <div className="relative">
                     <input
                       type="date"
@@ -123,7 +139,9 @@ export default function PlaceholderContent() {
 
                 {/* Gender */}
                 <div className="space-y-2">
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Gender
+                  </label>
                   <div className="relative">
                     <select
                       id="gender"
@@ -133,7 +151,9 @@ export default function PlaceholderContent() {
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       required
                     >
-                      <option value="" disabled>Select Gender</option>
+                      <option value="" disabled>
+                        Select Gender
+                      </option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
@@ -143,7 +163,9 @@ export default function PlaceholderContent() {
 
                 {/* Marital Status */}
                 <div className="space-y-2">
-                  <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Marital Status</label>
+                  <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Marital Status
+                  </label>
                   <div className="relative">
                     <select
                       id="maritalStatus"
@@ -153,7 +175,9 @@ export default function PlaceholderContent() {
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       required
                     >
-                      <option value="" disabled>Select Marital Status</option>
+                      <option value="" disabled>
+                        Select Marital Status
+                      </option>
                       <option value="single">Single</option>
                       <option value="married">Married</option>
                       <option value="divorced">Divorced</option>
@@ -164,7 +188,9 @@ export default function PlaceholderContent() {
 
                 {/* Occupation */}
                 <div className="space-y-2">
-                  <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Occupation</label>
+                  <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Occupation
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -181,7 +207,9 @@ export default function PlaceholderContent() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Email
+                  </label>
                   <div className="relative">
                     <input
                       type="email"
@@ -198,7 +226,9 @@ export default function PlaceholderContent() {
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Phone
+                  </label>
                   <div className="relative">
                     <input
                       type="tel"
@@ -215,7 +245,9 @@ export default function PlaceholderContent() {
 
                 {/* Address */}
                 <div className="space-y-2">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Address
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -232,7 +264,9 @@ export default function PlaceholderContent() {
 
                 {/* City */}
                 <div className="space-y-2">
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300">City</label>
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    City
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -249,24 +283,25 @@ export default function PlaceholderContent() {
 
                 {/* Country */}
                 <div className="space-y-2">
-                  <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Country</label>
+                  <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Country
+                  </label>
                   <div className="relative">
-                    <input
-                      type="text"
-                      id="country"
-                      name="country"
-                      value={formData.country}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      placeholder="Enter your country"
-                      required
+                    <ReactFlagsSelect
+                      selected={formData.country}
+                      onSelect={handleCountrySelect}
+                      searchable
+                      placeholder="Select your country"
+                      className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-black-100"
                     />
                   </div>
                 </div>
 
                 {/* Postal Code */}
                 <div className="space-y-2">
-                  <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Postal Code</label>
+                  <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Postal Code
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
@@ -283,23 +318,27 @@ export default function PlaceholderContent() {
 
                 {/* Allergy */}
                 <div className="space-y-2">
-                  <label htmlFor="allergy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Allergy</label>
+                  <label htmlFor="allergy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Allergy
+                  </label>
                   <div className="relative">
-                    <input
-                      type="text"
+                    <textarea
                       id="allergy"
                       name="allergy"
                       value={formData.allergy}
                       onChange={handleChange}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      placeholder="Enter any allergies"
+                      placeholder="Enter any allergies (e.g., peanuts, shellfish)"
+                      rows={3} // Adjust the number of rows as needed
                     />
                   </div>
                 </div>
 
                 {/* Blood Type */}
                 <div className="space-y-2">
-                  <label htmlFor="bloodType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Blood Type</label>
+                  <label htmlFor="bloodType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Blood Type
+                  </label>
                   <div className="relative">
                     <select
                       id="bloodType"
@@ -309,7 +348,9 @@ export default function PlaceholderContent() {
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       required
                     >
-                      <option value="" disabled>Select Blood Type</option>
+                      <option value="" disabled>
+                        Select Blood Type
+                      </option>
                       <option value="A+">A+</option>
                       <option value="A-">A-</option>
                       <option value="B+">B+</option>
@@ -330,7 +371,7 @@ export default function PlaceholderContent() {
                   className="w-full bg-orange-500 text-white py-3 px-6 rounded-md hover:bg-orange-600 transition-colors duration-300"
                   disabled={loading}
                 >
-                  {loading ? 'Submitting...' : 'Submit'}
+                  {loading ? "Submitting..." : "Submit"}
                 </Button>
               </div>
 
