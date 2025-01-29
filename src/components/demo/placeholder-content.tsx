@@ -10,12 +10,12 @@ export default function PlaceholderContent() {
     firstName: "",
     lastName: "",
     birthDate: "",
-    gender: "",
+    gender: "F",
     maritalStatus: "",
     occupation: "",
     email: "",
     phone: "",
-    address: "",
+    adress: "",
     city: "",
     country: "",
     postalCode: "",
@@ -46,7 +46,6 @@ export default function PlaceholderContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
     try {
       const response = await axios.post("http://localhost:4000/api/patient", formData, {
@@ -55,18 +54,31 @@ export default function PlaceholderContent() {
         },
       });
 
-      if (response.status === 200) {
-        setMessage("Form submitted successfully!");
-      } else {
-        setMessage(`Error: ${response.data.message || "Something went wrong"}`);
+      if (response.status >= 200 && response.status < 300) {
+        window.alert("Patient added successfully!");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          birthDate: "",
+          gender: "F",
+          maritalStatus: "",
+          occupation: "",
+          email: "",
+          phone: "",
+          adress: "",
+          city: "",
+          country: "",
+          postalCode: "",
+          allergy: "",
+          bloodType: "",
+        });
       }
     } catch (error: any) {
-      setMessage(`Error: ${error.message || "An unexpected error occurred"}`);
+      window.alert(`Error: ${error.response?.data?.message || error.message || "An unexpected error occurred"}`);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <Card className="rounded-lg border-none shadow-lg mt-6 bg-gradient-to-br from-white-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
       <CardContent className="p-8">
@@ -154,9 +166,9 @@ export default function PlaceholderContent() {
                       <option value="" disabled>
                         Select Gender
                       </option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
+                      <option value="M">Male</option>
+                      <option value="F">Female</option>
+                      <option value="O">Other</option>
                     </select>
                   </div>
                 </div>
@@ -245,15 +257,15 @@ export default function PlaceholderContent() {
 
                 {/* Address */}
                 <div className="space-y-2">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="adress" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Address
                   </label>
                   <div className="relative">
                     <input
                       type="text"
-                      id="address"
-                      name="address"
-                      value={formData.address}
+                      id="adress"
+                      name="adress"
+                      value={formData.adress}
                       onChange={handleChange}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your address"

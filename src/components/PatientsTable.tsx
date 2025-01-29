@@ -1,6 +1,7 @@
 // app/components/PatientsTable.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -22,49 +23,6 @@ interface Patient {
   startTime: string; // Added startTime field
   appointmentType: string;
 }
-
-const patients: Patient[] = [
-  {
-    firstName: "John",
-    lastName: "Doe",
-    gender: "Male",
-    allergy: "Peanuts",
-    bloodType: "A+",
-    appointmentDate: "2024-11-20",
-    startTime: "10:00 AM", // Added startTime
-    appointmentType: "Routine Check-up",
-  },
-  {
-    firstName: "Jane",
-    lastName: "Smith",
-    gender: "Female",
-    allergy: "None",
-    bloodType: "O-",
-    appointmentDate: "2024-12-10",
-    startTime: "02:30 PM", // Added startTime
-    appointmentType: "Follow-up",
-  },
-  {
-    firstName: "Alice",
-    lastName: "Johnson",
-    gender: "Female",
-    allergy: "Shellfish",
-    bloodType: "B+",
-    appointmentDate: "2024-11-25",
-    startTime: "09:15 AM", // Added startTime
-    appointmentType: "Emergency",
-  },
-  {
-    firstName: "Bob",
-    lastName: "Williams",
-    gender: "Male",
-    allergy: "Dairy",
-    bloodType: "AB+",
-    appointmentDate: "2024-12-01",
-    startTime: "11:45 AM", // Added startTime
-    appointmentType: "1st Visit",
-  },
-];
 
 const AllergyTag = ({ allergy }: { allergy: string }) => (
   <span className="px-2 py-1 bg-orange-50 text-orange-500 rounded-md text-sm dark:bg-orange-900 dark:text-orange-200">
@@ -133,15 +91,33 @@ export default function PatientsTable() {
   const [showUpcoming, setShowUpcoming] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/patient');
+        setPatients(response.data);
+      } catch (error: any) {
+        setError(error.message || 'An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   // Filter patients by search query
   const searchedPatients = patients.filter((patient) => {
     const query = searchQuery.toLowerCase();
     return (
-      patient.firstName.toLowerCase().includes(query) ||
-      patient.lastName.toLowerCase().includes(query) ||
-      patient.appointmentType.toLowerCase().includes(query) ||
-      patient.appointmentDate.includes(query)
+      (patient.firstName && patient.firstName.toLowerCase().includes(query)) ||
+      (patient.lastName && patient.lastName.toLowerCase().includes(query)) ||
+      (patient.appointmentType && patient.appointmentType.toLowerCase().includes(query)) ||
+      (patient.appointmentDate && patient.appointmentDate.includes(query))
     );
   });
 
@@ -158,6 +134,14 @@ export default function PatientsTable() {
         return appointmentDate > currentDate; // Only future dates
       })
     : sortedPatients;
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 mt-6">

@@ -72,7 +72,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/categories",
           label: "Consultation",
-          active: pathname.includes("/categories"),
+          active: pathname.includes("/consultation"),
           icon: Stethoscope,
           submenus: []
         },

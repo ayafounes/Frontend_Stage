@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,61 +10,109 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
-// Define the Zod schema for form validation
 const schema = z.object({
-  dateConsultation: z.string().min(1, "Consultation date is required"),
+  idPatient: z.string().uuid("Select a valid patient"),
+  idAppointement: z.string().uuid("Select a valid appointment"),
+  dateConsultation: z.coerce.date({  // Use coerce.date instead of string
+    required_error: "Consultation date is required",
+    invalid_type_error: "Invalid date format",
+  }),
   diagnostic: z.string().min(1, "Diagnostic is required"),
   treatment: z.string().min(1, "Treatment is required"),
   symptoms: z.string().min(1, "Symptoms are required"),
-  cost: z.string().min(1, "Cost is required").regex(/^\d+(\.\d{1,2})?$/, "Cost must be a valid number"),
-  statusPaiement: z.string().min(1, "Payment status is required"),
+  cost: z.string()
+    .min(1, "Cost is required")
+    .regex(/^\d+(\.\d{1,2})?$/, "Invalid cost format (e.g. 100.00)")
 });
-
-// Infer the type from the schema
 type FormData = z.infer<typeof schema>;
 
 export default function ConsultationSheet() {
+  const [patients, setPatients] = useState<{ idPatient: string, fullName: string }[]>([]);
+  const [appointments, setAppointments] = useState<{ idAppointement: string, dateAppointement: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
     setValue,
+    watch,
+    formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const selectedPatientId = watch("idPatient");
+
+  useEffect(() => {
+    axios.get('http://localhost:4000/api/patient')
+      .then(response => {
+        const patientData = response.data.map((patient: { idPatient: string, firstName: string, lastName: string }) => ({
+          idPatient: patient.idPatient,
+          fullName: `${patient.firstName} ${patient.lastName}`,
+        }));
+        setPatients(patientData);
+      })
+      .catch(error => {
+        console.error('Error fetching patients:', error);
+        window.alert('Failed to load patients.');
+      });
+  }, []);
+
+  useEffect(() => {
+    if (selectedPatientId) {
+      axios.get('http://localhost:4000/api/appointement')
+        .then(response => {
+          const filteredAppointments = response.data
+            .filter((appointment: any) => 
+              appointment.idPatient === selectedPatientId &&
+              appointment.idAppointement // Ensure this field exists
+            )
+            .map((appointment: any) => ({
+              idAppointement: appointment.idAppointement,
+              dateAppointement: new Date(appointment.dateAppointement).toISOString() // Keep as ISO string
+            }));
+          
+          setAppointments(filteredAppointments);
+        });
+    }
+  }, [selectedPatientId]);
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
-    setMessage('');
-
+    
     try {
-      const response = await axios.post('http://localhost:4000/api/consultation', data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      // Convert cost to numeric value (not string)
+      const payload = {
+        ...data,
+        cost: Number(data.cost), // Convert to number instead of string
+        dateConsultation: new Date(data.dateConsultation).toISOString()
+      };
+  
+      console.log("Submission Payload:", payload); // Debugging log
+  
+      const response = await axios.post('http://localhost:4000/api/consultation', payload, {
+        headers: { 'Content-Type': 'application/json' },
       });
-
+  
       if (response.status === 200) {
-        setMessage('Consultation submitted successfully!');
+        window.alert('Consultation created successfully!');
+        reset(); // Reset form fields
       } else {
-        setMessage(`Error: ${response.data.message || 'Something went wrong'}`);
+        window.alert(`${response.data.message || 'Something went wrong'}`);
       }
     } catch (error: any) {
-      setMessage(`Error: ${error.message || 'An unexpected error occurred'}`);
+      console.error("API Error:", error.response?.data || error.message);
+      window.alert(`Error: ${error.response?.data?.message || 'An unexpected error occurred'}`);
     } finally {
       setLoading(false);
     }
   };
-
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-cover bg-center dark:bg-gray-900" style={{ backgroundImage: "url('/path/to/your/image.png')" }}>
-      {/* Overlay Form */}
+    <div className="relative min-h-screen flex items-center justify-center bg-cover bg-center dark:bg-gray-900">
       <Card className="w-full max-w-2xl bg-white/90 backdrop-blur-sm dark:bg-gray-800/90">
         <CardHeader className="flex flex-col items-center">
-          {/* Consultation Sheet Title Centered */}
           <CardTitle className="text-2xl font-bold mt-8 text-orange-600 dark:text-orange-500 text-center">
             Consultation Sheet
           </CardTitle>
@@ -72,7 +120,63 @@ export default function ConsultationSheet() {
 
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Consultation Details Section */}
+          <div className="grid grid-cols-2 gap-4">
+  {/* Patient Selection */}
+  <div>
+    <label className="block text-sm font-medium text-muted-foreground dark:text-gray-300">
+      Patient
+    </label>
+    <Select
+      onValueChange={(value) => setValue("idPatient", value)}
+      value={watch("idPatient")} // Add value binding
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Select a patient" />
+      </SelectTrigger>
+      <SelectContent>
+        {patients.map((patient) => (
+          <SelectItem key={patient.idPatient} value={patient.idPatient}>
+            {patient.fullName}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    {errors.idPatient && (
+      <p className="text-red-500 text-sm mt-1">{errors.idPatient.message}</p>
+    )}
+  </div>
+
+  {/* Appointment Selection */}
+  <div>
+    <label className="block text-sm font-medium text-muted-foreground dark:text-gray-300">
+      Appointment
+    </label>
+    <Select
+      onValueChange={(value) => setValue("idAppointement", value)} // Match backend field name
+      value={watch("idAppointement")} // Add value binding
+      disabled={!selectedPatientId}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Select an appointment" />
+      </SelectTrigger>
+      <SelectContent>
+        {appointments.map((appointment) => (
+          <SelectItem 
+            key={appointment.idAppointement} 
+            value={appointment.idAppointement}
+          >
+            {appointment.dateAppointement}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    {errors.idAppointement && (
+      <p className="text-red-500 text-sm mt-1">{errors.idAppointement.message}</p>
+    )}
+  </div>
+</div>
+            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="dateConsultation" className="block text-sm font-medium text-muted-foreground dark:text-gray-300">Consultation Date</label>
