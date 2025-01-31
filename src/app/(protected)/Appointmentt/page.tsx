@@ -9,8 +9,9 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import PatientsTable from '@/components/PatientsTable';
+import AppointmentsTable from '@/components/AppointmentTable';
 
-export default function PostsPage() {
+export default function AppointmenttPage() {
   return (
     <ContentLayout title="Appointment Form">
       <Breadcrumb>
@@ -29,12 +30,12 @@ export default function PostsPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/appointment">Patients List</Link>
+              <Link href="/appointment">Appointments List</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <PatientsTable />
+      <AppointmentsTable />
     </ContentLayout>
   );
 }

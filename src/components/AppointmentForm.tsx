@@ -1,4 +1,4 @@
-'use client'; 
+'use client';
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -8,13 +8,14 @@ import { z } from 'zod';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 
+// Zod schema for form validation
 const schema = z.object({
-  idPatient: z.string().uuid("Invalid patient ID"),  
-  dateAppointement: z.string().min(1, "Appointment date is required"), 
+  idPatient: z.string().uuid("Invalid patient ID"),
+  dateAppointement: z.string().min(1, "Appointment date is required"),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   typeAppointement: z.string().min(1, "Appointment type is required"),
-  description: z.string().optional(),
+  description: z.string().optional(), // Optional field
 });
 
 type FormData = z.infer<typeof schema>;
@@ -32,6 +33,7 @@ export default function AppointmentForm() {
     resolver: zodResolver(schema),
   });
 
+  // Fetch patients on component mount
   useEffect(() => {
     axios.get('http://localhost:4000/api/patient')
       .then(response => {
@@ -47,19 +49,22 @@ export default function AppointmentForm() {
       });
   }, []);
 
+  // Handle form submission
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
 
     try {
+      // Prepare payload
       const payload = {
         idPatient: data.idPatient,
         dateAppointement: new Date(data.dateAppointement).toISOString(),
         startTime: `${data.startTime}:00`,
         endTime: `${data.endTime}:00`,
         typeAppointement: data.typeAppointement,
-        description: data.description || "",
+        description: data.description || "", // Ensure description is an empty string if not provided
       };
 
+      // Submit the form data
       const response = await axios.post('http://localhost:4000/api/appointement', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -87,6 +92,7 @@ export default function AppointmentForm() {
               <h2 className="text-3xl font-bold text-center">Appointment Form</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Patient Selection */}
                 <div>
                   <label htmlFor="idPatient">Patient</label>
                   <select {...register("idPatient")} className="w-full p-3 border rounded">
@@ -100,42 +106,48 @@ export default function AppointmentForm() {
                   {errors.idPatient && <p className="text-red-500">{errors.idPatient.message}</p>}
                 </div>
 
+                {/* Appointment Date */}
                 <div>
                   <label htmlFor="dateAppointement">Appointment Date</label>
                   <input type="date" {...register("dateAppointement")} className="w-full p-3 border rounded" />
                   {errors.dateAppointement && <p className="text-red-500">{errors.dateAppointement.message}</p>}
                 </div>
 
+                {/* Start Time */}
                 <div>
                   <label htmlFor="startTime">Start Time</label>
                   <input type="time" {...register("startTime")} className="w-full p-3 border rounded" />
                   {errors.startTime && <p className="text-red-500">{errors.startTime.message}</p>}
                 </div>
 
+                {/* End Time */}
                 <div>
                   <label htmlFor="endTime">End Time</label>
                   <input type="time" {...register("endTime")} className="w-full p-3 border rounded" />
                   {errors.endTime && <p className="text-red-500">{errors.endTime.message}</p>}
                 </div>
 
+                {/* Appointment Type */}
                 <div>
                   <label htmlFor="typeAppointement">Appointment Type</label>
                   <select {...register("typeAppointement")} className="w-full p-3 border rounded">
                     <option value="">Select an option</option>
-                    <option value="emergency">Emergency</option>
-                    <option value="routine">Routine Check-up</option>
-                    <option value="follow-up">Follow-up</option>
-                    <option value="first-visit">First Visit</option>
+                    <option value="emergency">emergency</option>
+                    <option value="routine">check-up</option>
+                    <option value="follow-up">follow-up</option>
+                    <option value="first-visit">first-visit</option>
                   </select>
                   {errors.typeAppointement && <p className="text-red-500">{errors.typeAppointement.message}</p>}
                 </div>
 
+                {/* Description (Optional) */}
                 <div>
                   <label htmlFor="description">Description (Optional)</label>
                   <textarea {...register("description")} className="w-full p-3 border rounded" rows={4} />
                 </div>
               </div>
 
+              {/* Submit Button */}
               <div>
                 <Button type="submit" disabled={loading} className="w-full bg-orange-500 text-white p-3 rounded">
                   {loading ? 'Submitting...' : 'Submit Appointment'}

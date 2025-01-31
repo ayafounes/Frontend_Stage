@@ -4,51 +4,54 @@ import axios from "axios";
 import ReactFlagsSelect from "react-flags-select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { z } from "zod"; // Import Zod
+import { zodResolver } from "@hookform/resolvers/zod"; // For React Hook Form integration
+import { useForm, SubmitHandler } from "react-hook-form"; // For form handling
+
+// Define the Zod schema for form validation
+const patientSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  birthDate: z.string().min(1, "Birth date is required"),
+  gender: z.enum(["M", "F", "O"]),
+  maritalStatus: z.string().optional(),
+  occupation: z.string().optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  phone: z.string().min(1, "Phone number is required"),
+  adress: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
+  postalCode: z.string().optional(),
+  allergy: z.string().optional(),
+  bloodType: z.string().optional(),
+});
+
+// Infer the type from the Zod schema
+type PatientFormData = z.infer<typeof patientSchema>;
 
 export default function PlaceholderContent() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    gender: "F",
-    maritalStatus: "",
-    occupation: "",
-    email: "",
-    phone: "",
-    adress: "",
-    city: "",
-    country: "",
-    postalCode: "",
-    allergy: "",
-    bloodType: "",
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    watch,
+  } = useForm<PatientFormData>({
+    resolver: zodResolver(patientSchema), // Integrate Zod with React Hook Form
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
   const handleCountrySelect = (countryCode: string) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      country: countryCode,
-    }));
+    setValue("country", countryCode); // Set the country value using React Hook Form's setValue
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<PatientFormData> = async (data) => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:4000/api/patient", formData, {
+      const response = await axios.post("http://localhost:4000/api/patient", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -56,22 +59,8 @@ export default function PlaceholderContent() {
 
       if (response.status >= 200 && response.status < 300) {
         window.alert("Patient added successfully!");
-        setFormData({
-          firstName: "",
-          lastName: "",
-          birthDate: "",
-          gender: "F",
-          maritalStatus: "",
-          occupation: "",
-          email: "",
-          phone: "",
-          adress: "",
-          city: "",
-          country: "",
-          postalCode: "",
-          allergy: "",
-          bloodType: "",
-        });
+        // Reset the form
+        Object.keys(data).forEach((key) => setValue(key as keyof PatientFormData, ""));
       }
     } catch (error: any) {
       window.alert(`Error: ${error.response?.data?.message || error.message || "An unexpected error occurred"}`);
@@ -79,12 +68,13 @@ export default function PlaceholderContent() {
       setLoading(false);
     }
   };
+
   return (
     <Card className="rounded-lg border-none shadow-lg mt-6 bg-gradient-to-br from-white-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
       <CardContent className="p-8">
         <div className="flex justify-center items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
           <div className="flex flex-col relative w-full max-w-4xl">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6 relative">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-red-600">
                   Patient Form
@@ -102,13 +92,13 @@ export default function PlaceholderContent() {
                     <input
                       type="text"
                       id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
+                      {...register("firstName")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your first name"
-                      required
                     />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -121,13 +111,13 @@ export default function PlaceholderContent() {
                     <input
                       type="text"
                       id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
+                      {...register("lastName")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your last name"
-                      required
                     />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -140,12 +130,12 @@ export default function PlaceholderContent() {
                     <input
                       type="date"
                       id="birthDate"
-                      name="birthDate"
-                      value={formData.birthDate}
-                      onChange={handleChange}
+                      {...register("birthDate")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     />
+                    {errors.birthDate && (
+                      <p className="text-red-500 text-sm mt-1">{errors.birthDate.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -157,11 +147,8 @@ export default function PlaceholderContent() {
                   <div className="relative">
                     <select
                       id="gender"
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleChange}
+                      {...register("gender")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     >
                       <option value="" disabled>
                         Select Gender
@@ -170,10 +157,13 @@ export default function PlaceholderContent() {
                       <option value="F">Female</option>
                       <option value="O">Other</option>
                     </select>
+                    {errors.gender && (
+                      <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
+                    )}
                   </div>
                 </div>
 
-                {/* Marital Status */}
+                {/* Marital Status (Optional) */}
                 <div className="space-y-2">
                   <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Marital Status
@@ -181,15 +171,10 @@ export default function PlaceholderContent() {
                   <div className="relative">
                     <select
                       id="maritalStatus"
-                      name="maritalStatus"
-                      value={formData.maritalStatus}
-                      onChange={handleChange}
+                      {...register("maritalStatus")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     >
-                      <option value="" disabled>
-                        Select Marital Status
-                      </option>
+                      <option value="">Select Marital Status (Optional)</option>
                       <option value="single">Single</option>
                       <option value="married">Married</option>
                       <option value="divorced">Divorced</option>
@@ -198,7 +183,7 @@ export default function PlaceholderContent() {
                   </div>
                 </div>
 
-                {/* Occupation */}
+                {/* Occupation (Optional) */}
                 <div className="space-y-2">
                   <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Occupation
@@ -207,17 +192,14 @@ export default function PlaceholderContent() {
                     <input
                       type="text"
                       id="occupation"
-                      name="occupation"
-                      value={formData.occupation}
-                      onChange={handleChange}
+                      {...register("occupation")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      placeholder="Enter your occupation"
-                      required
+                      placeholder="Enter your occupation (Optional)"
                     />
                   </div>
                 </div>
 
-                {/* Email */}
+                {/* Email (Optional) */}
                 <div className="space-y-2">
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email
@@ -226,13 +208,13 @@ export default function PlaceholderContent() {
                     <input
                       type="email"
                       id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
+                      {...register("email")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      placeholder="Enter your email"
-                      required
+                      placeholder="Enter your email (Optional)"
                     />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -245,13 +227,13 @@ export default function PlaceholderContent() {
                     <input
                       type="tel"
                       id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
+                      {...register("phone")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your phone number"
-                      required
                     />
+                    {errors.phone && (
+                      <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -264,13 +246,13 @@ export default function PlaceholderContent() {
                     <input
                       type="text"
                       id="adress"
-                      name="adress"
-                      value={formData.adress}
-                      onChange={handleChange}
+                      {...register("adress")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your address"
-                      required
                     />
+                    {errors.adress && (
+                      <p className="text-red-500 text-sm mt-1">{errors.adress.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -283,13 +265,13 @@ export default function PlaceholderContent() {
                     <input
                       type="text"
                       id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
+                      {...register("city")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
                       placeholder="Enter your city"
-                      required
                     />
+                    {errors.city && (
+                      <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -300,16 +282,19 @@ export default function PlaceholderContent() {
                   </label>
                   <div className="relative">
                     <ReactFlagsSelect
-                      selected={formData.country}
+                      selected={watch("country")}
                       onSelect={handleCountrySelect}
                       searchable
                       placeholder="Select your country"
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-black-100"
                     />
+                    {errors.country && (
+                      <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>
+                    )}
                   </div>
                 </div>
 
-                {/* Postal Code */}
+                {/* Postal Code (Optional) */}
                 <div className="space-y-2">
                   <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Postal Code
@@ -318,17 +303,14 @@ export default function PlaceholderContent() {
                     <input
                       type="text"
                       id="postalCode"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleChange}
+                      {...register("postalCode")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      placeholder="Enter your postal code"
-                      required
+                      placeholder="Enter your postal code (Optional)"
                     />
                   </div>
                 </div>
 
-                {/* Allergy */}
+                {/* Allergy (Optional) */}
                 <div className="space-y-2">
                   <label htmlFor="allergy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Allergy
@@ -336,17 +318,15 @@ export default function PlaceholderContent() {
                   <div className="relative">
                     <textarea
                       id="allergy"
-                      name="allergy"
-                      value={formData.allergy}
-                      onChange={handleChange}
+                      {...register("allergy")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      placeholder="Enter any allergies (e.g., peanuts, shellfish)"
-                      rows={3} // Adjust the number of rows as needed
+                      placeholder="Enter any allergies (Optional)"
+                      rows={3}
                     />
                   </div>
                 </div>
 
-                {/* Blood Type */}
+                {/* Blood Type (Optional) */}
                 <div className="space-y-2">
                   <label htmlFor="bloodType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Blood Type
@@ -354,15 +334,10 @@ export default function PlaceholderContent() {
                   <div className="relative">
                     <select
                       id="bloodType"
-                      name="bloodType"
-                      value={formData.bloodType}
-                      onChange={handleChange}
+                      {...register("bloodType")}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-gray-100"
-                      required
                     >
-                      <option value="" disabled>
-                        Select Blood Type
-                      </option>
+                      <option value="">Select Blood Type (Optional)</option>
                       <option value="A+">A+</option>
                       <option value="A-">A-</option>
                       <option value="B+">B+</option>

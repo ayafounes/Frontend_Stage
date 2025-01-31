@@ -34,7 +34,7 @@ export default function DashboardPage() {
       
       <DashboardMetrics />
       <div className="px-4">
-        <PatientsTable />
+        
       </div>
     </ContentLayout>
   );

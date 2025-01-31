@@ -52,6 +52,10 @@ export default function ConsultationSheet() {
           idPatient: patient.idPatient,
           fullName: `${patient.firstName} ${patient.lastName}`,
         }));
+
+        // Sort patients alphabetically by fullName
+        patientData.sort((a: { fullName: string }, b: { fullName: string }) => a.fullName.localeCompare(b.fullName));
+
         setPatients(patientData);
       })
       .catch(error => {
@@ -64,20 +68,25 @@ export default function ConsultationSheet() {
     if (selectedPatientId) {
       axios.get('http://localhost:4000/api/appointement')
         .then(response => {
+          // Log the response to check the structure of the data
+          console.log("Appointments Data:", response.data);
+          
           const filteredAppointments = response.data
-            .filter((appointment: any) => 
-              appointment.idPatient === selectedPatientId &&
-              appointment.idAppointement // Ensure this field exists
-            )
+            .filter((appointment: any) => appointment.idPatient === selectedPatientId)
             .map((appointment: any) => ({
               idAppointement: appointment.idAppointement,
-              dateAppointement: new Date(appointment.dateAppointement).toISOString() // Keep as ISO string
+              dateAppointement: new Date(appointment.dateAppointement).toISOString(),
             }));
           
+          console.log("Filtered Appointments:", filteredAppointments);
           setAppointments(filteredAppointments);
+        })
+        .catch(error => {
+          console.error('Error fetching appointments:', error);
         });
     }
   }, [selectedPatientId]);
+  
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);

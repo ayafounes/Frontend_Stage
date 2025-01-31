@@ -51,38 +51,86 @@ export function getMenuList(pathname: string): Group[] {
       menus: [
         {
           href: "", // Update to a valid route if needed
-          label: "Forms",
+          label: "Patients",
           active: pathname.includes("/posts"),
-          icon: SquarePen,
+          icon:  UserPlus,
           submenus: [
             {
               href: "/posts",
-              label: "New Appointment",
+              label: "Patients List",
               active: pathname.includes("/posts"), // Use includes for flexibility
               icon: CalendarPlus
             },
             {
               href: "/posts/new",
-              label: "New Patient",
+              label: "Add patient",
               active: pathname.includes("/posts/new"), // Use includes for flexibility
               icon: UserPlus
             }
           ]
         },
         {
-          href: "/categories",
-          label: "Consultation",
-          active: pathname.includes("/consultation"),
-          icon: Stethoscope,
-          submenus: []
+          href: "", // Update to a valid route if needed
+          label: "Appointments",
+          active: pathname.includes("/Appointmentt"),
+          icon:  CalendarPlus,
+          submenus: [
+            {
+              href: "/Appointmentt",
+              label: "Appointments List",
+              active: pathname.includes("/Appointmentt"), // Use includes for flexibility
+              icon: CalendarPlus
+            },
+            {
+              href: "/Appointmentt/new",
+              label: "Add Appointments",
+              active: pathname.includes("/Appointmentt/new"), // Use includes for flexibility
+              icon: UserPlus
+            }
+          ]
         },
         {
-          href: "/tags",
-          label: "Prescription",
-          active: pathname.includes("/tags"),
+          href: "", // Update to a valid route if needed
+          label: "Consultations",
+          active: pathname.includes("/consultation"),
+          icon: Stethoscope,
+          submenus: [
+            {
+              href: "/consultation",
+              label: "Consultations List",
+              active: pathname.includes("/consultation"), // Use includes for flexibility
+              icon: CalendarPlus
+            },
+            {
+              href: "/consultation/new",
+              label: "Add Consultations",
+              active: pathname.includes("/consultation/new"), // Use includes for flexibility
+              icon: UserPlus
+            }
+          ]
+        },
+        {
+          href: "", // Update to a valid route if needed
+          label: "Prescreptions",
+          active: pathname.includes("/prescreption"),
           icon: Pill,
-          submenus: []
-        }
+          submenus: [
+            {
+              href: "/prescreption",
+              label: "Prescreptions List",
+              active: pathname.includes("/prescreption"), // Use includes for flexibility
+              icon: CalendarPlus
+            },
+            {
+              href: "/prescreption/new",
+              label: "Add Prescreptions",
+              active: pathname.includes("/prescreption/new"), // Use includes for flexibility
+              icon: UserPlus
+            }
+          ]
+        },
+        
+        
       ]
     },
     {
