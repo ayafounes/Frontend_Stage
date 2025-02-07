@@ -9,7 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ActivityIcon, GridIcon, ListIcon, CalendarIcon, SearchIcon, MoreVertical, Trash2, Eye, Edit } from "lucide-react";
+import {
+  ActivityIcon,
+  GridIcon,
+  ListIcon,
+  CalendarIcon,
+  SearchIcon,
+  MoreVertical,
+  Trash2,
+  Eye,
+  Edit,
+} from "lucide-react";
 
 interface Consultation {
   idConsultation: string;
@@ -45,10 +55,14 @@ const PatientInitial = ({ name }: { name: string }) => (
   </div>
 );
 
-const ConsultationModal = ({ consultation, patient, onClose }: { 
-  consultation: Consultation | null, 
-  patient: Patient | null,
-  onClose: () => void 
+const ConsultationModal = ({
+  consultation,
+  patient,
+  onClose,
+}: {
+  consultation: Consultation | null;
+  patient: Patient | null;
+  onClose: () => void;
 }) => {
   if (!consultation || !patient) return null;
 
@@ -57,33 +71,55 @@ const ConsultationModal = ({ consultation, patient, onClose }: {
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
         <h3 className="text-lg font-semibold mb-4">Consultation Details</h3>
         <div className="space-y-2">
-          <div><strong>Patient:</strong> {patient.firstName} {patient.lastName}</div>
-          <div><strong>Date:</strong> {new Date(consultation.dateConsultation).toLocaleDateString()}</div>
-          <div><strong>Diagnostic:</strong> {consultation.diagnostic}</div>
-          <div><strong>Symptoms:</strong> {consultation.symptoms}</div>
-          <div><strong>Treatment:</strong> {consultation.treatment}</div>
-          <div><strong>Cost:</strong> {consultation.cost}</div>
+          <div>
+            <strong>Patient:</strong> {patient.firstName} {patient.lastName}
+          </div>
+          <div>
+            <strong>Date:</strong>{" "}
+            {new Date(consultation.dateConsultation).toLocaleDateString()}
+          </div>
+          <div>
+            <strong>Diagnostic:</strong> {consultation.diagnostic}
+          </div>
+          <div>
+            <strong>Symptoms:</strong> {consultation.symptoms}
+          </div>
+          <div>
+            <strong>Treatment:</strong> {consultation.treatment}
+          </div>
+          <div>
+            <strong>Cost:</strong> {consultation.cost}
+          </div>
         </div>
         <div className="flex justify-end mt-4">
-          <button onClick={onClose} className="bg-orange-500 text-white px-4 py-2 rounded-md">Close</button>
+          <button
+            onClick={onClose}
+            className="bg-orange-500 text-white px-4 py-2 rounded-md"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-const EditConsultationModal = ({ 
-  consultation, 
+const EditConsultationModal = ({
+  consultation,
   patient,
-  onClose, 
-  onSave 
-}: { 
-  consultation: Consultation | null,
-  patient: Patient | null,
-  onClose: () => void,
-  onSave: (updatedPatient: Patient, updatedConsultation: Consultation) => void 
+  onClose,
+  onSave,
+}: {
+  consultation: Consultation | null;
+  patient: Patient | null;
+  onClose: () => void;
+  onSave: (updatedPatient: Patient, updatedConsultation: Consultation) => void;
 }) => {
-  const [formDataPatient, setFormDataPatient] = useState<Patient>({ idPatient: "", firstName: "", lastName: "" });
+  const [formDataPatient, setFormDataPatient] = useState<Patient>({
+    idPatient: "",
+    firstName: "",
+    lastName: "",
+  });
   const [formDataConsultation, setFormDataConsultation] = useState<Consultation>({
     idConsultation: "",
     idPatient: "",
@@ -91,7 +127,7 @@ const EditConsultationModal = ({
     diagnostic: "",
     treatment: "",
     symptoms: "",
-    cost: ""
+    cost: "",
   });
 
   useEffect(() => {
@@ -112,45 +148,68 @@ const EditConsultationModal = ({
         <h3 className="text-lg font-semibold mb-4">Edit Consultation</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Patient First Name</label>
+            <label className="block text-sm font-medium mb-1">
+              Patient First Name
+            </label>
             <input
               type="text"
               value={formDataPatient.firstName}
-              onChange={(e) => setFormDataPatient({ ...formDataPatient, firstName: e.target.value })}
+              onChange={(e) =>
+                setFormDataPatient({ ...formDataPatient, firstName: e.target.value })
+              }
               className="w-full p-2 border rounded-md"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Patient Last Name</label>
+            <label className="block text-sm font-medium mb-1">
+              Patient Last Name
+            </label>
             <input
               type="text"
               value={formDataPatient.lastName}
-              onChange={(e) => setFormDataPatient({ ...formDataPatient, lastName: e.target.value })}
+              onChange={(e) =>
+                setFormDataPatient({ ...formDataPatient, lastName: e.target.value })
+              }
               className="w-full p-2 border rounded-md"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Treatment</label>
+            <label className="block text-sm font-medium mb-1">
+              Treatment
+            </label>
             <input
               type="text"
               value={formDataConsultation.treatment}
-              onChange={(e) => setFormDataConsultation({ ...formDataConsultation, treatment: e.target.value })}
+              onChange={(e) =>
+                setFormDataConsultation({ ...formDataConsultation, treatment: e.target.value })
+              }
               className="w-full p-2 border rounded-md"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Diagnostic</label>
+            <label className="block text-sm font-medium mb-1">
+              Diagnostic
+            </label>
             <input
               type="text"
               value={formDataConsultation.diagnostic}
-              onChange={(e) => setFormDataConsultation({ ...formDataConsultation, diagnostic: e.target.value })}
+              onChange={(e) =>
+                setFormDataConsultation({ ...formDataConsultation, diagnostic: e.target.value })
+              }
               className="w-full p-2 border rounded-md"
             />
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className="px-4 py-2 text-gray-500">Cancel</button>
-          <button onClick={handleSubmit} className="px-4 py-2 bg-orange-500 text-white rounded-md">Save</button>
+          <button onClick={onClose} className="px-4 py-2 text-gray-500">
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-orange-500 text-white rounded-md"
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
@@ -167,42 +226,42 @@ export default function ConsultationsTable() {
   const [error, setError] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null);
-  const [editingData, setEditingData] = useState<{ consultation: Consultation | null, patient: Patient | null }>({ 
-    consultation: null, 
-    patient: null 
-  });
+  const [editingData, setEditingData] = useState<{
+    consultation: Consultation | null;
+    patient: Patient | null;
+  }>({ consultation: null, patient: null });
 
-  const dropdownRef = useRef<HTMLDivElement>(null); // Ref for the dropdown menu
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Click-outside handler
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenMenuId(null); // Close the dropdown if clicked outside
+        setOpenMenuId(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
+    return () =>
       document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [patientsRes, consultationsRes] = await Promise.all([
-          axios.get('http://localhost:4000/api/patient'),
-          axios.get('http://localhost:4000/api/consultation')
+          axios.get("http://localhost:4000/api/patient"),
+          axios.get("http://localhost:4000/api/consultation"),
         ]);
 
         setPatients(patientsRes.data);
-        setConsultations(consultationsRes.data.map((c: any) => ({
-          ...c,
-          dateConsultation: new Date(c.dateConsultation).toISOString()
-        })));
+        setConsultations(
+          consultationsRes.data.map((c: any) => ({
+            ...c,
+            dateConsultation: new Date(c.dateConsultation).toISOString(),
+          }))
+        );
       } catch (error: any) {
-        setError(error.message || 'Error fetching data');
+        setError(error.message || "Error fetching data");
       } finally {
         setLoading(false);
       }
@@ -213,7 +272,7 @@ export default function ConsultationsTable() {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`http://localhost:4000/api/consultation/${id}`);
-      setConsultations(consultations.filter(c => c.idConsultation !== id));
+      setConsultations(consultations.filter((c) => c.idConsultation !== id));
     } catch (error) {
       alert("Error deleting consultation");
     }
@@ -223,18 +282,25 @@ export default function ConsultationsTable() {
     try {
       await axios.put(`http://localhost:4000/api/patient/${updatedPatient.idPatient}`, updatedPatient);
       await axios.put(`http://localhost:4000/api/consultation/${updatedConsultation.idConsultation}`, updatedConsultation);
-      
-      setPatients(patients.map(p => p.idPatient === updatedPatient.idPatient ? updatedPatient : p));
-      setConsultations(consultations.map(c => 
-        c.idConsultation === updatedConsultation.idConsultation ? updatedConsultation : c
-      ));
+
+      setPatients(
+        patients.map((p) =>
+          p.idPatient === updatedPatient.idPatient ? updatedPatient : p
+        )
+      );
+      setConsultations(
+        consultations.map((c) =>
+          c.idConsultation === updatedConsultation.idConsultation ? updatedConsultation : c
+        )
+      );
     } catch (error) {
       alert("Error saving changes");
     }
   };
 
-  const filteredConsultations = consultations.filter(c => {
-    const patient = patients.find(p => p.idPatient === c.idPatient);
+  // First, filter consultations by search query.
+  const searchedConsultations = consultations.filter((c) => {
+    const patient = patients.find((p) => p.idPatient === c.idPatient);
     const patientName = patient ? `${patient.firstName} ${patient.lastName}`.toLowerCase() : "";
     return (
       patientName.includes(searchQuery.toLowerCase()) ||
@@ -243,13 +309,28 @@ export default function ConsultationsTable() {
     );
   });
 
+  // If "Upcoming Dates" is toggled, further filter to only include consultations with a date today or in the future.
+  const filteredConsultations = searchedConsultations.filter((c) => {
+    if (showUpcoming) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const consultationDate = new Date(c.dateConsultation);
+      consultationDate.setHours(0, 0, 0, 0);
+      return consultationDate >= today;
+    }
+    return true;
+  });
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 mt-6">
+      {/* Header */}
       <div className="p-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Consultations List</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Consultations List
+        </h2>
         <div className="flex items-center gap-4">
           <div className="relative">
             <input
@@ -284,79 +365,173 @@ export default function ConsultationsTable() {
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-gray-50 dark:bg-gray-700">
-            <TableHead>Patient</TableHead>
-            <TableHead>Diagnostic</TableHead>
-            <TableHead>Treatment</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Cost</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredConsultations.map(consultation => {
-            const patient = patients.find(p => p.idPatient === consultation.idPatient);
-            return (
-              <TableRow key={consultation.idConsultation}>
-                <TableCell className="flex items-center gap-2">
-                  <PatientInitial name={patient ? `${patient.firstName} ${patient.lastName}` : "Unknown"} />
-                  {patient?.firstName} {patient?.lastName}
-                </TableCell>
-                <TableCell><DiagnosticTag diagnostic={consultation.diagnostic} /></TableCell>
-                <TableCell>{consultation.treatment}</TableCell>
-                <TableCell>{new Date(consultation.dateConsultation).toLocaleDateString()}</TableCell>
-                <TableCell>{consultation.cost}</TableCell>
-                <TableCell className="relative">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(openMenuId === consultation.idConsultation ? null : consultation.idConsultation);
-                    }}
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
-                  {openMenuId === consultation.idConsultation && (
-                    <div 
-                      ref={dropdownRef} // Attach the ref to the dropdown menu
-                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10"
+      {/* Conditionally render Table or Grid view using filteredConsultations */}
+      {viewMode === "table" ? (
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 dark:bg-gray-700">
+              <TableHead>Patient</TableHead>
+              <TableHead>Diagnostic</TableHead>
+              <TableHead>Treatment</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Cost</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredConsultations.map((consultation) => {
+              const patient = patients.find((p) => p.idPatient === consultation.idPatient);
+              return (
+                <TableRow key={consultation.idConsultation}>
+                  <TableCell className="flex items-center gap-2">
+                    <PatientInitial
+                      name={
+                        patient
+                          ? `${patient.firstName} ${patient.lastName}`
+                          : "Unknown"
+                      }
+                    />
+                    {patient?.firstName} {patient?.lastName}
+                  </TableCell>
+                  <TableCell>
+                    <DiagnosticTag diagnostic={consultation.diagnostic} />
+                  </TableCell>
+                  <TableCell>{consultation.treatment}</TableCell>
+                  <TableCell>
+                    {new Date(consultation.dateConsultation).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{consultation.cost}</TableCell>
+                  <TableCell className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(
+                          openMenuId === consultation.idConsultation
+                            ? null
+                            : consultation.idConsultation
+                        );
+                      }}
                     >
-                      <button
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => setSelectedConsultation(consultation)}
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {openMenuId === consultation.idConsultation && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10"
                       >
-                        <Eye className="inline mr-2 w-4 h-4" /> View
-                      </button>
-                      <button
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => setEditingData({ consultation, patient: patient || null })}
-                      >
-                        <Edit className="inline mr-2 w-4 h-4" /> Edit
-                      </button>
-                      <button
-                        className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => {
-                          if (confirm("Delete this consultation?")) {
-                            handleDelete(consultation.idConsultation);
+                        <button
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600"
+                          onClick={() => setSelectedConsultation(consultation)}
+                        >
+                          <Eye className="inline mr-2 w-4 h-4" /> View
+                        </button>
+                        <button
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600"
+                          onClick={() =>
+                            setEditingData({
+                              consultation,
+                              patient: patient || null,
+                            })
                           }
-                        }}
-                      >
-                        <Trash2 className="inline mr-2 w-4 h-4" /> Delete
-                      </button>
-                    </div>
-                  )}
-                </TableCell>
-              </TableRow>
+                        >
+                          <Edit className="inline mr-2 w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          onClick={() => {
+                            if (confirm("Delete this consultation?")) {
+                              handleDelete(consultation.idConsultation);
+                            }
+                          }}
+                        >
+                          <Trash2 className="inline mr-2 w-4 h-4" /> Delete
+                        </button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      ) : (
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredConsultations.map((consultation) => {
+            const patient = patients.find((p) => p.idPatient === consultation.idPatient);
+            return (
+              <div
+                key={consultation.idConsultation}
+                className="border rounded-lg p-4 bg-white dark:bg-gray-800 shadow"
+              >
+                <div className="flex items-center gap-2">
+                  <PatientInitial
+                    name={
+                      patient
+                        ? `${patient.firstName} ${patient.lastName}`
+                        : "Unknown"
+                    }
+                  />
+                  <span className="font-medium">
+                    {patient?.firstName} {patient?.lastName}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <DiagnosticTag diagnostic={consultation.diagnostic} />
+                </div>
+                <div className="mt-2">
+                  <div>
+                    <strong>Treatment:</strong> {consultation.treatment}
+                  </div>
+                  <div>
+                    <strong>Date:</strong>{" "}
+                    {new Date(consultation.dateConsultation).toLocaleDateString()}
+                  </div>
+                  <div>
+                    <strong>Cost:</strong> {consultation.cost}
+                  </div>
+                </div>
+                <div className="mt-2 flex justify-end space-x-2">
+                  <button
+                    onClick={() => setSelectedConsultation(consultation)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Eye className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setEditingData({
+                        consultation,
+                        patient: patient || null,
+                      })
+                    }
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm("Delete this consultation?")) {
+                        handleDelete(consultation.idConsultation);
+                      }
+                    }}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             );
           })}
-        </TableBody>
-      </Table>
+        </div>
+      )}
 
       {selectedConsultation && (
         <ConsultationModal
           consultation={selectedConsultation}
-          patient={patients.find(p => p.idPatient === selectedConsultation.idPatient) || null}
+          patient={
+            patients.find((p) => p.idPatient === selectedConsultation.idPatient) ||
+            null
+          }
           onClose={() => setSelectedConsultation(null)}
         />
       )}
@@ -365,7 +540,9 @@ export default function ConsultationsTable() {
         <EditConsultationModal
           consultation={editingData.consultation}
           patient={editingData.patient}
-          onClose={() => setEditingData({ consultation: null, patient: null })}
+          onClose={() =>
+            setEditingData({ consultation: null, patient: null })
+          }
           onSave={handleSave}
         />
       )}

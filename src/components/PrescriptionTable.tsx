@@ -9,7 +9,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { GridIcon, ListIcon, SearchIcon, MoreVertical, Trash2, Eye, Edit } from "lucide-react";
+import {
+  GridIcon,
+  ListIcon,
+  SearchIcon,
+  MoreVertical,
+  Trash2,
+  Eye,
+  Edit,
+  CalendarIcon,
+} from "lucide-react";
 
 interface Prescription {
   idPrescription: string;
@@ -45,9 +54,12 @@ const PatientInitial = ({ name }: { name: string }) => (
   </div>
 );
 
-const PrescriptionModal = ({ prescription, onClose }: { 
-  prescription: Prescription | null, 
-  onClose: () => void 
+const PrescriptionModal = ({
+  prescription,
+  onClose,
+}: {
+  prescription: Prescription | null;
+  onClose: () => void;
 }) => {
   if (!prescription) return null;
 
@@ -56,30 +68,50 @@ const PrescriptionModal = ({ prescription, onClose }: {
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
         <h3 className="text-lg font-semibold mb-4">Prescription Details</h3>
         <div className="space-y-2">
-          <div><strong>Patient:</strong> {prescription.patientFullName}</div>
-          <div><strong>Date:</strong> {new Date(prescription.datePrescription).toLocaleDateString()}</div>
-          <div><strong>Medication:</strong> {prescription.nameMedication}</div>
-          <div><strong>Type:</strong> {prescription.typeMedication}</div>
-          <div><strong>Treatment:</strong> {prescription.treatment}</div>
+          <div>
+            <strong>Patient:</strong> {prescription.patientFullName}
+          </div>
+          <div>
+            <strong>Date:</strong>{" "}
+            {new Date(prescription.datePrescription).toLocaleDateString()}
+          </div>
+          <div>
+            <strong>Medication:</strong> {prescription.nameMedication}
+          </div>
+          <div>
+            <strong>Type:</strong> {prescription.typeMedication}
+          </div>
+          <div>
+            <strong>Treatment:</strong> {prescription.treatment}
+          </div>
         </div>
         <div className="flex justify-end mt-4">
-          <button onClick={onClose} className="bg-orange-500 text-white px-4 py-2 rounded-md">Close</button>
+          <button
+            onClick={onClose}
+            className="bg-orange-500 text-white px-4 py-2 rounded-md"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-const EditPrescriptionModal = ({ 
+const EditPrescriptionModal = ({
   patient,
-  onClose, 
-  onSave 
-}: { 
-  patient: Patient | null,
-  onClose: () => void,
-  onSave: (updatedPatient: Patient) => void 
+  onClose,
+  onSave,
+}: {
+  patient: Patient | null;
+  onClose: () => void;
+  onSave: (updatedPatient: Patient) => void;
 }) => {
-  const [formDataPatient, setFormDataPatient] = useState<Patient>({ idPatient: "", firstName: "", lastName: "" });
+  const [formDataPatient, setFormDataPatient] = useState<Patient>({
+    idPatient: "",
+    firstName: "",
+    lastName: "",
+  });
 
   useEffect(() => {
     if (patient) {
@@ -98,27 +130,48 @@ const EditPrescriptionModal = ({
         <h3 className="text-lg font-semibold mb-4">Edit Patient Name</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Patient First Name</label>
+            <label className="block text-sm font-medium mb-1">
+              Patient First Name
+            </label>
             <input
               type="text"
               value={formDataPatient.firstName}
-              onChange={(e) => setFormDataPatient({ ...formDataPatient, firstName: e.target.value })}
+              onChange={(e) =>
+                setFormDataPatient({
+                  ...formDataPatient,
+                  firstName: e.target.value,
+                })
+              }
               className="w-full p-2 border rounded-md"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Patient Last Name</label>
+            <label className="block text-sm font-medium mb-1">
+              Patient Last Name
+            </label>
             <input
               type="text"
               value={formDataPatient.lastName}
-              onChange={(e) => setFormDataPatient({ ...formDataPatient, lastName: e.target.value })}
+              onChange={(e) =>
+                setFormDataPatient({
+                  ...formDataPatient,
+                  lastName: e.target.value,
+                })
+              }
               className="w-full p-2 border rounded-md"
             />
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className="px-4 py-2 text-gray-500">Cancel</button>
-          <button onClick={handleSubmit} className="px-4 py-2 bg-orange-500 text-white rounded-md">Save</button>
+          <button onClick={onClose} className="px-4 py-2 text-gray-500">
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-orange-500 text-white rounded-md"
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
@@ -128,53 +181,68 @@ const EditPrescriptionModal = ({
 export default function PrescriptionTable() {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [showUpcoming, setShowUpcoming] = useState<boolean>(false);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
+  const [selectedPrescription, setSelectedPrescription] =
+    useState<Prescription | null>(null);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [sortConfig, setSortConfig] = useState<{ key: keyof Prescription; direction: "asc" | "desc" }>({
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Prescription;
+    direction: "asc" | "desc";
+  }>({
     key: "patientFullName",
     direction: "asc",
   });
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpenMenuId(null); // Close the dropdown if clicked outside
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
+    return () =>
       document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [patientsRes, prescriptionsRes, consultationsRes] = await Promise.all([
-          axios.get('http://localhost:4000/api/patient'),
-          axios.get('http://localhost:4000/api/prescreption'),
-          axios.get('http://localhost:4000/api/consultation')
-        ]);
+        const [patientsRes, prescriptionsRes, consultationsRes] =
+          await Promise.all([
+            axios.get("http://localhost:4000/api/patient"),
+            axios.get("http://localhost:4000/api/prescreption"),
+            axios.get("http://localhost:4000/api/consultation"),
+          ]);
 
         const patientsData = patientsRes.data;
         const prescriptionsData = prescriptionsRes.data;
         const consultationsData = consultationsRes.data;
 
         const mergedPrescriptions = prescriptionsData.map((prescription: any) => {
-          const patient = patientsData.find((p: any) => p.idPatient === prescription.idPatient);
-          const consultation = consultationsData.find((c: any) => c.idPatient === prescription.idPatient);
+          const patient = patientsData.find(
+            (p: any) => p.idPatient === prescription.idPatient
+          );
+          const consultation = consultationsData.find(
+            (c: any) => c.idPatient === prescription.idPatient
+          );
 
           return {
             ...prescription,
-            patientFullName: patient ? `${patient.firstName} ${patient.lastName}` : "Unknown Patient",
+            patientFullName: patient
+              ? `${patient.firstName} ${patient.lastName}`
+              : "Unknown Patient",
             treatment: consultation ? consultation.treatment : "N/A",
           };
         });
@@ -182,7 +250,7 @@ export default function PrescriptionTable() {
         setPatients(patientsData);
         setPrescriptions(mergedPrescriptions);
       } catch (error: any) {
-        setError(error.message || 'An error occurred while fetching data');
+        setError(error.message || "An error occurred while fetching data");
       } finally {
         setLoading(false);
       }
@@ -194,7 +262,9 @@ export default function PrescriptionTable() {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`http://localhost:4000/api/prescreption/${id}`);
-      setPrescriptions(prescriptions.filter(p => p.idPrescription !== id));
+      setPrescriptions(
+        prescriptions.filter((p) => p.idPrescription !== id)
+      );
     } catch (error) {
       alert("Error deleting prescription");
     }
@@ -202,31 +272,53 @@ export default function PrescriptionTable() {
 
   const handleSave = async (updatedPatient: Patient) => {
     try {
-      // Update patient
-      await axios.put(`http://localhost:4000/api/patient/${updatedPatient.idPatient}`, updatedPatient);
-      
-      // Update state
-      setPatients(patients.map(p => p.idPatient === updatedPatient.idPatient ? updatedPatient : p));
-      
-      // Update prescriptions with the new patient name
-      setPrescriptions(prescriptions.map(p => 
-        p.idPatient === updatedPatient.idPatient 
-          ? { ...p, patientFullName: `${updatedPatient.firstName} ${updatedPatient.lastName}` } 
-          : p
-      ));
+      // Update patient information
+      await axios.put(
+        `http://localhost:4000/api/patient/${updatedPatient.idPatient}`,
+        updatedPatient
+      );
+
+      // Update state for patients
+      setPatients(
+        patients.map((p) =>
+          p.idPatient === updatedPatient.idPatient ? updatedPatient : p
+        )
+      );
+
+      // Also update prescriptions with the new patient name
+      setPrescriptions(
+        prescriptions.map((p) =>
+          p.idPatient === updatedPatient.idPatient
+            ? {
+                ...p,
+                patientFullName: `${updatedPatient.firstName} ${updatedPatient.lastName}`,
+              }
+            : p
+        )
+      );
     } catch (error) {
       alert("Error saving changes");
     }
   };
 
-  const filteredPrescriptions = prescriptions.filter(p => {
+  // First, filter prescriptions by search query.
+  // Then, if "Upcoming Dates" is toggled, further filter to only include prescriptions with a date today or in the future.
+  const filteredPrescriptions = prescriptions.filter((p) => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesQuery =
       p.patientFullName.toLowerCase().includes(query) ||
       p.nameMedication.toLowerCase().includes(query) ||
       p.typeMedication.toLowerCase().includes(query) ||
-      p.treatment.toLowerCase().includes(query)
-    );
+      p.treatment.toLowerCase().includes(query);
+    if (!matchesQuery) return false;
+    if (showUpcoming) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const prescriptionDate = new Date(p.datePrescription);
+      prescriptionDate.setHours(0, 0, 0, 0);
+      return prescriptionDate >= today;
+    }
+    return true;
   });
 
   const sortedPrescriptions = [...filteredPrescriptions].sort((a, b) => {
@@ -239,7 +331,8 @@ export default function PrescriptionTable() {
   });
 
   const handleSort = (key: keyof Prescription) => {
-    const direction = sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key, direction });
   };
 
@@ -248,8 +341,11 @@ export default function PrescriptionTable() {
 
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 mt-6">
+      {/* Header */}
       <div className="p-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Prescriptions List</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Prescriptions List
+        </h2>
         <div className="flex items-center gap-4">
           <div className="relative">
             <input
@@ -273,48 +369,88 @@ export default function PrescriptionTable() {
           >
             <GridIcon className="w-4 h-4" />
           </button>
+          {/* Divider */}
+          <div className="h-5 w-px bg-gray-200 dark:bg-gray-700" />
+          {/* Upcoming Dates Button */}
+          <button
+            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 dark:hover:text-gray-200"
+            onClick={() => setShowUpcoming(!showUpcoming)}
+          >
+            <CalendarIcon className="w-5 h-5" />
+            {showUpcoming ? "All Dates" : "Upcoming Dates"}
+          </button>
         </div>
       </div>
 
+      {/* Conditionally render Table or Grid view */}
       {viewMode === "table" ? (
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 dark:bg-gray-700">
-              <TableHead onClick={() => handleSort("patientFullName")}>Patient</TableHead>
-              <TableHead onClick={() => handleSort("nameMedication")}>Medication</TableHead>
-              <TableHead onClick={() => handleSort("typeMedication")}>Type</TableHead>
-              <TableHead onClick={() => handleSort("treatment")}>Treatment</TableHead>
-              <TableHead onClick={() => handleSort("datePrescription")}>Date</TableHead>
+              <TableHead onClick={() => handleSort("patientFullName")}>
+                Patient
+              </TableHead>
+              <TableHead onClick={() => handleSort("nameMedication")}>
+                Medication
+              </TableHead>
+              <TableHead onClick={() => handleSort("typeMedication")}>
+                Type
+              </TableHead>
+              <TableHead onClick={() => handleSort("treatment")}>
+                Treatment
+              </TableHead>
+              <TableHead onClick={() => handleSort("datePrescription")}>
+                Date
+              </TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedPrescriptions.map((prescription) => {
-              const patient = patients.find(p => p.idPatient === prescription.idPatient);
+              const patient = patients.find(
+                (p) => p.idPatient === prescription.idPatient
+              );
               return (
-                <TableRow key={prescription.idPrescription} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <TableRow
+                  key={prescription.idPrescription}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <PatientInitial name={prescription.patientFullName} />
-                      <div className="font-medium">{prescription.patientFullName}</div>
+                      <div className="font-medium">
+                        {prescription.patientFullName}
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell><MedicationTag name={prescription.nameMedication} /></TableCell>
-                  <TableCell>{prescription.typeMedication}</TableCell>
-                  <TableCell><TreatmentTag treatment={prescription.treatment} /></TableCell>
-                  <TableCell>{new Date(prescription.datePrescription).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <MedicationTag name={prescription.nameMedication} />
+                  </TableCell>
+                  <TableHead onClick={() => handleSort("typeMedication")}>
+                    <TableCell>{prescription.typeMedication}</TableCell>
+                  </TableHead>
+                  <TableCell>
+                    <TreatmentTag treatment={prescription.treatment} />
+                  </TableCell>
+                  <TableCell>
+                    {new Date(prescription.datePrescription).toLocaleDateString()}
+                  </TableCell>
                   <TableCell className="relative">
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === prescription.idPrescription ? null : prescription.idPrescription);
+                        setOpenMenuId(
+                          openMenuId === prescription.idPrescription
+                            ? null
+                            : prescription.idPrescription
+                        );
                       }}
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
                     {openMenuId === prescription.idPrescription && (
-                      <div 
-                        ref={dropdownRef} // Attach the ref to the dropdown menu
+                      <div
+                        ref={dropdownRef}
                         className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10"
                       >
                         <button
@@ -325,7 +461,9 @@ export default function PrescriptionTable() {
                         </button>
                         <button
                           className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600"
-                          onClick={() => setEditingPatient(patient || null)}
+                          onClick={() =>
+                            setEditingPatient(patient || null)
+                          }
                         >
                           <Edit className="inline mr-2 w-4 h-4" /> Edit
                         </button>
@@ -348,8 +486,62 @@ export default function PrescriptionTable() {
           </TableBody>
         </Table>
       ) : (
-        <div className="p-4">
-          {/* Grid view implementation */}
+        // Grid View Implementation
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedPrescriptions.map((prescription) => {
+            const patient = patients.find(
+              (p) => p.idPatient === prescription.idPatient
+            );
+            return (
+              <div
+                key={prescription.idPrescription}
+                className="border rounded-lg p-4 bg-white dark:bg-gray-800 shadow"
+              >
+                <div className="flex items-center gap-3">
+                  <PatientInitial name={prescription.patientFullName} />
+                  <span className="font-medium">
+                    {prescription.patientFullName}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <MedicationTag name={prescription.nameMedication} />
+                </div>
+                <div className="mt-2 text-sm">
+                  <strong>Type:</strong> {prescription.typeMedication}
+                </div>
+                <div className="mt-2">
+                  <TreatmentTag treatment={prescription.treatment} />
+                </div>
+                <div className="mt-2 text-sm">
+                  {new Date(prescription.datePrescription).toLocaleDateString()}
+                </div>
+                <div className="mt-2 flex justify-end space-x-2">
+                  <button
+                    onClick={() => setSelectedPrescription(prescription)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Eye className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setEditingPatient(patient || null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm("Delete this prescription?")) {
+                        handleDelete(prescription.idPrescription);
+                      }
+                    }}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
