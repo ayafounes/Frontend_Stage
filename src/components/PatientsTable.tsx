@@ -205,7 +205,7 @@ export default function AppointmentsTable() {
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 mt-6">
       <div className="p-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Appointments List</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Patients List</h2>
         <div className="flex items-center gap-4">
           <div className="relative">
             <input
