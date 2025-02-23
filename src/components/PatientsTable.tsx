@@ -9,11 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ActivityIcon,
   GridIcon,
   ListIcon,
-  CalendarIcon,
   SearchIcon,
   MoreVertical,
   Trash2,
@@ -21,16 +21,35 @@ import {
   Edit,
 } from "lucide-react";
 
-interface Appointment {
-  idAppointement: string;
+interface Patient {
   idPatient: string;
-  patientFullName: string;
-  dateAppointement: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  typeAppointement: string;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  gender: string;
+  maritalStatus: string;
+  occupation: string;
+  email: string;
+  phone: string;
+  adress: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  allergy: string;
+  bloodType: string;
 }
+
+const AllergyTag = ({ allergy }: { allergy: string }) => (
+  <span className="px-2 py-1 bg-orange-50 text-orange-500 rounded-md text-sm dark:bg-orange-900 dark:text-orange-200">
+    {allergy}
+  </span>
+);
+
+const BloodTypeTag = ({ bloodType }: { bloodType: string }) => (
+  <span className="px-2 py-1 bg-blue-50 text-blue-500 rounded-md text-sm dark:bg-blue-900 dark:text-blue-200">
+    {bloodType}
+  </span>
+);
 
 const PatientInitial = ({ name }: { name: string }) => (
   <div className="w-8 h-8 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center text-sm font-medium dark:bg-orange-900 dark:text-orange-200">
@@ -38,50 +57,54 @@ const PatientInitial = ({ name }: { name: string }) => (
   </div>
 );
 
-const getTypeColor = (type: string) => {
-  switch (type) {
-    case "emergency":
-      return "bg-red-50 text-red-500 dark:bg-red-900 dark:text-red-200";
-    case "Check-up":
-      return "bg-green-50 text-green-500 dark:bg-green-900 dark:text-green-200";
-    case "follow-up":
-      return "bg-yellow-50 text-yellow-500 dark:bg-yellow-900 dark:text-yellow-200";
-    case "first-visit":
-      return "bg-gray-50 text-gray-500 dark:bg-gray-900 dark:text-gray-200";
-    default:
-      return "";
-  }
-};
-
-const AppointmentModal = ({
-  appointment,
+////////////////////
+// VIEW MODAL
+////////////////////
+const PatientModal = ({
+  patient,
   onClose,
 }: {
-  appointment: Appointment | null;
+  patient: Patient | null;
   onClose: () => void;
 }) => {
-  if (!appointment) return null;
+  if (!patient) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
-        <h3 className="text-lg font-semibold mb-4">Appointment Information</h3>
+        <h3 className="text-lg font-semibold mb-4">Patient Information</h3>
         <div className="space-y-2">
           <div>
-            <strong>Patient:</strong> {appointment.patientFullName}
+            <strong>Name:</strong> {patient.firstName} {patient.lastName}
           </div>
           <div>
-            <strong>Date:</strong>{" "}
-            {new Date(appointment.dateAppointement).toLocaleDateString()}
+            <strong>Birth Date:</strong>{" "}
+            {new Date(patient.birthDate).toLocaleDateString()}
           </div>
           <div>
-            <strong>Time:</strong> {appointment.startTime} - {appointment.endTime}
+            <strong>Gender:</strong> {patient.gender}
           </div>
           <div>
-            <strong>Type:</strong> {appointment.typeAppointement}
+            <strong>Phone:</strong> {patient.phone}
           </div>
           <div>
-            <strong>Description:</strong> {appointment.description}
+            <strong>Email:</strong> {patient.email}
+          </div>
+          <div>
+            <strong>Address:</strong> {patient.adress}, {patient.city},{" "}
+            {patient.country}
+          </div>
+          <div>
+            <strong>Occupation:</strong> {patient.occupation}
+          </div>
+          <div>
+            <strong>Marital Status:</strong> {patient.maritalStatus}
+          </div>
+          <div>
+            <strong>Blood Type:</strong> {patient.bloodType}
+          </div>
+          <div>
+            <strong>Allergy:</strong> {patient.allergy}
           </div>
         </div>
         <div className="flex justify-end mt-4">
@@ -97,22 +120,25 @@ const AppointmentModal = ({
   );
 };
 
-const EditAppointmentModal = ({
-  appointment,
+////////////////////
+// EDIT MODAL
+////////////////////
+const EditPatientModal = ({
+  patient,
   onClose,
   onSave,
 }: {
-  appointment: Appointment | null;
+  patient: Patient | null;
   onClose: () => void;
-  onSave: (updatedAppointment: Appointment) => void;
+  onSave: (updatedPatient: Patient) => void;
 }) => {
-  const [formData, setFormData] = useState<Appointment | null>(null);
+  const [formData, setFormData] = useState<Patient | null>(null);
 
   useEffect(() => {
-    if (appointment) {
-      setFormData(appointment);
+    if (patient) {
+      setFormData(patient);
     }
-  }, [appointment]);
+  }, [patient]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (formData) {
@@ -130,33 +156,46 @@ const EditAppointmentModal = ({
   if (!formData) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
-        <h3 className="text-lg font-semibold mb-4">Edit Appointment</h3>
+        <h3 className="text-lg font-semibold mb-4">Edit Patient</h3>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Patient Full Name
+            First Name
           </label>
           <input
             type="text"
-            name="patientFullName"
-            value={formData.patientFullName}
+            name="firstName"
+            value={formData.firstName}
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           />
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Appointment Date
+            Last Name
           </label>
           <input
-            type="date"
-            name="dateAppointement"
-            value={formData.dateAppointement.split("T")[0]} // Assuming date is in ISO format
+            type="text"
+            name="lastName"
+            value={formData.lastName}
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           />
         </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+          />
+        </div>
+        {/* Additional fields can be added here */}
         <div className="flex justify-end">
           <button onClick={onClose} className="mr-2 text-gray-500">
             Cancel
@@ -173,47 +212,118 @@ const EditAppointmentModal = ({
   );
 };
 
-export default function AppointmentsTable() {
-  const [showUpcoming, setShowUpcoming] = useState<boolean>(false);
+////////////////////
+// GRID COMPONENT (Icons only)
+////////////////////
+interface PatientsGridProps {
+  patients: Patient[];
+  onDelete: (id: string) => void;
+  onView: (patient: Patient) => void;
+  onEdit: (patient: Patient) => void;
+}
+
+const PatientsGrid = ({
+  patients,
+  onDelete,
+  onView,
+  onEdit,
+}: PatientsGridProps) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      {patients.map((patient) => (
+        <div
+          key={patient.idPatient}
+          className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 p-4"
+        >
+          <div className="flex items-center gap-3">
+            <PatientInitial name={patient.firstName} />
+            <div>
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {patient.firstName} {patient.lastName}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {patient.gender} •{" "}
+                {new Date(patient.birthDate).toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 text-sm text-gray-700 dark:text-gray-300 space-y-2">
+            <div>
+              <strong>Phone:</strong> {patient.phone || "-"}
+            </div>
+            <div>
+              <strong>Email:</strong> {patient.email || "-"}
+            </div>
+            <div>
+              <strong>Address:</strong> {patient.adress}, {patient.city},{" "}
+              {patient.country}
+            </div>
+            <div>
+              <strong>Occupation:</strong> {patient.occupation || "-"}
+            </div>
+            <div>
+              <strong>Marital Status:</strong> {patient.maritalStatus || "-"}
+            </div>
+            <div>
+              <strong>Blood Type:</strong>{" "}
+              <BloodTypeTag bloodType={patient.bloodType} />
+            </div>
+            <div>
+              <strong>Allergy:</strong>{" "}
+              <AllergyTag allergy={patient.allergy} />
+            </div>
+          </div>
+          <div className="mt-2 flex justify-end">
+            <button
+              onClick={() => onView(patient)}
+              className="text-gray-400 hover:text-gray-600 mr-2"
+            >
+              <Eye className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => onEdit(patient)}
+              className="text-gray-400 hover:text-gray-600 mr-2"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => {
+                if (
+                  confirm("Are you sure you want to delete this patient?")
+                ) {
+                  onDelete(patient.idPatient);
+                }
+              }}
+              className="text-red-600 hover:text-red-800"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+////////////////////
+// MAIN COMPONENT
+////////////////////
+export default function PatientsTable() {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedAppointment, setSelectedAppointment] =
-    useState<Appointment | null>(null);
-  const [editingAppointment, setEditingAppointment] =
-    useState<Appointment | null>(null);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null); // Track which menu is open
+  // For table view dropdown actions
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [patientsRes, appointmentsRes] = await Promise.all([
-          axios.get("http://localhost:4000/api/patient"),
-          axios.get("http://localhost:4000/api/appointement"),
-        ]);
-
-        const patientsData = patientsRes.data;
-        const appointmentsData = appointmentsRes.data;
-
-        const mergedAppointments = appointmentsData.map((appointment: any) => {
-          const patient = patientsData.find(
-            (p: any) => p.idPatient === appointment.idPatient
-          );
-
-          return {
-            ...appointment,
-            patientFullName: patient
-              ? `${patient.firstName} ${patient.lastName}`
-              : "Unknown Patient",
-            dateAppointement: appointment.dateAppointement,
-            startTime: appointment.startTime.slice(0, 5),
-            endTime: appointment.endTime.slice(0, 5),
-          };
-        });
-
-        setAppointments(mergedAppointments);
+        const response = await axios.get("http://localhost:4000/api/patient");
+        setPatients(response.data);
       } catch (error: any) {
         setError(error.message || "An error occurred while fetching data");
       } finally {
@@ -224,62 +334,47 @@ export default function AppointmentsTable() {
     fetchData();
   }, []);
 
-  const handleDeleteAppointment = async (id: string) => {
+  const handleDeletePatient = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:4000/api/appointement/${id}`);
-      setAppointments(
-        appointments.filter(
-          (appointment) => appointment.idAppointement !== id
-        )
-      );
-      alert("Appointment deleted successfully");
+      await axios.delete(`http://localhost:4000/api/patient/${id}`);
+      setPatients(patients.filter((patient) => patient.idPatient !== id));
+      alert("Patient deleted successfully");
     } catch (error) {
-      alert("Error deleting appointment");
+      alert("Error deleting patient");
     }
   };
 
-  const handleEditAppointment = async (updatedAppointment: Appointment) => {
+  const handleEditPatient = async (updatedPatient: Patient) => {
     try {
       await axios.put(
-        `http://localhost:4000/api/appointement/${updatedAppointment.idAppointement}`,
-        updatedAppointment
+        `http://localhost:4000/api/patient/${updatedPatient.idPatient}`,
+        updatedPatient
       );
-      setAppointments(
-        appointments.map((appointment) =>
-          appointment.idAppointement === updatedAppointment.idAppointement
-            ? updatedAppointment
-            : appointment
+      setPatients(
+        patients.map((patient) =>
+          patient.idPatient === updatedPatient.idPatient
+            ? updatedPatient
+            : patient
         )
       );
-      alert("Appointment updated successfully");
+      alert("Patient updated successfully");
     } catch (error) {
-      alert("Error updating appointment");
+      alert("Error updating patient");
     }
   };
 
-  // First, filter appointments by the search query
-  const searchedAppointments = appointments.filter((appointment) => {
+  const searchedPatients = patients.filter((patient) => {
     const query = searchQuery.toLowerCase();
     return (
-      appointment.patientFullName.toLowerCase().includes(query) ||
-      (appointment.description &&
-        appointment.description.toLowerCase().includes(query)) ||
-      appointment.typeAppointement.toLowerCase().includes(query) ||
-      appointment.dateAppointement.toLowerCase().includes(query)
+      patient.firstName.toLowerCase().includes(query) ||
+      patient.lastName.toLowerCase().includes(query) ||
+      patient.phone.toLowerCase().includes(query) ||
+      patient.email?.toLowerCase().includes(query) ||
+      patient.city.toLowerCase().includes(query) ||
+      patient.country.toLowerCase().includes(query) ||
+      patient.occupation?.toLowerCase().includes(query) ||
+      patient.maritalStatus?.toLowerCase().includes(query)
     );
-  });
-
-  // Then, if "Upcoming Dates" is toggled, further filter appointments to only include future dates.
-  const filteredAppointments = searchedAppointments.filter((appointment) => {
-    if (showUpcoming) {
-      // Compare only the date part (ignoring time)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const appointmentDate = new Date(appointment.dateAppointement);
-      appointmentDate.setHours(0, 0, 0, 0);
-      return appointmentDate >= today;
-    }
-    return true;
   });
 
   if (loading) return <div>Loading...</div>;
@@ -287,7 +382,7 @@ export default function AppointmentsTable() {
 
   return (
     <div className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 mt-6">
-      {/* Header section with search and view mode buttons */}
+      {/* Header with Search and View Mode toggles */}
       <div className="p-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Patients List
@@ -296,7 +391,7 @@ export default function AppointmentsTable() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search by patient, type, or date..."
+              placeholder="Search by name, phone, email, or city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
@@ -316,37 +411,44 @@ export default function AppointmentsTable() {
             <GridIcon className="w-5 h-5" />
           </button>
           <div className="h-5 w-px bg-gray-200 dark:bg-gray-700" />
-          <button
-            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 dark:hover:text-gray-200"
-            onClick={() => setShowUpcoming(!showUpcoming)}
-          >
-            <CalendarIcon className="w-5 h-5" />
-            {showUpcoming ? "All Dates" : "Upcoming Dates"}
+          <button className="flex items-center gap-2 text-gray-500 dark:text-gray-400 dark:hover:text-gray-200">
+            <ActivityIcon className="w-5 h-5" />
+            Medical History
           </button>
-          
         </div>
       </div>
 
-      {/* Conditionally render Table or Grid view based on the viewMode state */}
+      {/* Render Table or Grid view based on viewMode */}
       {viewMode === "table" ? (
-        // Table View
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 dark:bg-gray-700">
+              <TableHead className="w-12 text-gray-900 dark:text-gray-100">
+                <Checkbox />
+              </TableHead>
               <TableHead className="text-gray-900 dark:text-gray-100">
                 Patient
               </TableHead>
               <TableHead className="text-gray-900 dark:text-gray-100">
-                Appointment Type
+                Gender
               </TableHead>
               <TableHead className="text-gray-900 dark:text-gray-100">
-                Appointment Date
+                Birth Date
               </TableHead>
               <TableHead className="text-gray-900 dark:text-gray-100">
-                Time
+                Phone
               </TableHead>
               <TableHead className="text-gray-900 dark:text-gray-100">
-                Description
+                Email
+              </TableHead>
+              <TableHead className="text-gray-900 dark:text-gray-100">
+                Address
+              </TableHead>
+              <TableHead className="text-gray-900 dark:text-gray-100">
+                Blood Type
+              </TableHead>
+              <TableHead className="text-gray-900 dark:text-gray-100">
+                Allergy
               </TableHead>
               <TableHead className="text-gray-900 dark:text-gray-100">
                 Actions
@@ -354,60 +456,65 @@ export default function AppointmentsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAppointments.map((appointment) => (
+            {searchedPatients.map((patient) => (
               <TableRow
-                key={appointment.idAppointement}
+                key={patient.idPatient}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <TableCell>
+                  <Checkbox />
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-3">
-                    <PatientInitial name={appointment.patientFullName} />
-                    <div className="font-medium">
-                      {appointment.patientFullName}
+                    <PatientInitial name={patient.firstName} />
+                    <div>
+                      <div className="font-medium">
+                        {patient.firstName} {patient.lastName}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {patient.occupation || "No occupation specified"}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
+                <TableCell>{patient.gender}</TableCell>
                 <TableCell>
-                  <span
-                    className={`px-2 py-1 rounded-md text-sm ${getTypeColor(
-                      appointment.typeAppointement
-                    )}`}
-                  >
-                    {appointment.typeAppointement || "-"}
-                  </span>
+                  {new Date(patient.birthDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{patient.phone}</TableCell>
+                <TableCell>{patient.email || "-"}</TableCell>
+                <TableCell>
+                  {patient.adress}, {patient.city}, {patient.country}
                 </TableCell>
                 <TableCell>
-                  {new Date(appointment.dateAppointement).toLocaleDateString()}
+                  <BloodTypeTag bloodType={patient.bloodType} />
                 </TableCell>
                 <TableCell>
-                  {appointment.startTime} - {appointment.endTime}
+                  <AllergyTag allergy={patient.allergy} />
                 </TableCell>
-                <TableCell>{appointment.description || "-"}</TableCell>
                 <TableCell className="relative">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId(
-                        openMenuId === appointment.idAppointement
-                          ? null
-                          : appointment.idAppointement
+                        openMenuId === patient.idPatient ? null : patient.idPatient
                       );
                     }}
                     className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     <MoreVertical className="w-5 h-5" />
                   </button>
-                  {openMenuId === appointment.idAppointement && (
+                  {openMenuId === patient.idPatient && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-10">
                       <button
                         className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-                        onClick={() => setSelectedAppointment(appointment)}
+                        onClick={() => setSelectedPatient(patient)}
                       >
                         <Eye className="w-4 h-4 mr-2" /> View
                       </button>
                       <button
                         className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-                        onClick={() => setEditingAppointment(appointment)}
+                        onClick={() => setEditingPatient(patient)}
                       >
                         <Edit className="w-4 h-4 mr-2" /> Edit
                       </button>
@@ -415,13 +522,9 @@ export default function AppointmentsTable() {
                         className="w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
                         onClick={() => {
                           if (
-                            confirm(
-                              "Are you sure you want to delete this appointment?"
-                            )
+                            confirm("Are you sure you want to delete this patient?")
                           ) {
-                            handleDeleteAppointment(
-                              appointment.idAppointement
-                            );
+                            handleDeletePatient(patient.idPatient);
                           }
                         }}
                       >
@@ -435,86 +538,26 @@ export default function AppointmentsTable() {
           </TableBody>
         </Table>
       ) : (
-        // Grid View
-        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAppointments.map((appointment) => (
-            <div
-              key={appointment.idAppointement}
-              className="border rounded-lg p-4 bg-white dark:bg-gray-800 shadow"
-            >
-              <div className="flex items-center gap-3">
-                <PatientInitial name={appointment.patientFullName} />
-                <div className="font-medium">
-                  {appointment.patientFullName}
-                </div>
-              </div>
-              <div className="mt-2">
-                <span
-                  className={`px-2 py-1 rounded-md text-sm ${getTypeColor(
-                    appointment.typeAppointement
-                  )}`}
-                >
-                  {appointment.typeAppointement || "-"}
-                </span>
-              </div>
-              <div className="mt-2">
-                <div>
-                  <strong>Date:</strong>{" "}
-                  {new Date(appointment.dateAppointement).toLocaleDateString()}
-                </div>
-                <div>
-                  <strong>Time:</strong> {appointment.startTime} - {appointment.endTime}
-                </div>
-              </div>
-              <div className="mt-2">
-                <strong>Description:</strong> {appointment.description || "-"}
-              </div>
-              <div className="mt-2 flex justify-end">
-                <button
-                  onClick={() => setSelectedAppointment(appointment)}
-                  className="text-gray-400 hover:text-gray-600 mr-2"
-                >
-                  <Eye className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setEditingAppointment(appointment)}
-                  className="text-gray-400 hover:text-gray-600 mr-2"
-                >
-                  <Edit className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => {
-                    if (
-                      confirm(
-                        "Are you sure you want to delete this appointment?"
-                      )
-                    ) {
-                      handleDeleteAppointment(appointment.idAppointement);
-                    }
-                  }}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Modals */}
-      {selectedAppointment && (
-        <AppointmentModal
-          appointment={selectedAppointment}
-          onClose={() => setSelectedAppointment(null)}
+        <PatientsGrid
+          patients={searchedPatients}
+          onDelete={handleDeletePatient}
+          onView={setSelectedPatient}
+          onEdit={setEditingPatient}
         />
       )}
 
-      {editingAppointment && (
-        <EditAppointmentModal
-          appointment={editingAppointment}
-          onClose={() => setEditingAppointment(null)}
-          onSave={handleEditAppointment}
+      {/* Render modals if a patient is selected for view or edit */}
+      {selectedPatient && (
+        <PatientModal
+          patient={selectedPatient}
+          onClose={() => setSelectedPatient(null)}
+        />
+      )}
+      {editingPatient && (
+        <EditPatientModal
+          patient={editingPatient}
+          onClose={() => setEditingPatient(null)}
+          onSave={handleEditPatient}
         />
       )}
     </div>

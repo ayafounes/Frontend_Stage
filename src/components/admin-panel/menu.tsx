@@ -16,6 +16,7 @@ import {
   TooltipContent,
   TooltipProvider
 } from "@/components/ui/tooltip";
+import { SignOutButton } from "@clerk/nextjs"; // Import Clerk's SignOutButton
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -31,9 +32,6 @@ export function Menu({ isOpen }: MenuProps) {
     // Clear user-related data (e.g., tokens, roles) from localStorage or session storage
     localStorage.removeItem("userRole"); // Example: Remove user role
     localStorage.removeItem("authToken"); // Example: Remove authentication token
-
-    // Redirect to the login page
-    router.push("/login");
   };
 
   return (
@@ -119,23 +117,28 @@ export function Menu({ isOpen }: MenuProps) {
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleSignOut} // Call handleSignOut on click
-                    variant="outline"
-                    className="w-full justify-center h-10 mt-5"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <LogOut size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                      )}
+                  <SignOutButton>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center h-10 mt-5"
+                      onClick={() => {
+                        handleSignOut(); // Call handleSignOut before redirecting
+                        router.push("/sign-in"); // Redirect to the sign-in page
+                      }}
                     >
-                      Sign out
-                    </p>
-                  </Button>
+                      <span className={cn(isOpen === false ? "" : "mr-4")}>
+                        <LogOut size={18} />
+                      </span>
+                      <p
+                        className={cn(
+                          "whitespace-nowrap",
+                          isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                        )}
+                      >
+                        Sign out
+                      </p>
+                    </Button>
+                  </SignOutButton>
                 </TooltipTrigger>
                 {isOpen === false && (
                   <TooltipContent side="right">Sign out</TooltipContent>
